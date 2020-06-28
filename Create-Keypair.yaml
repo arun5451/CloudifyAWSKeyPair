@@ -1,0 +1,27 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+   - types.yaml
+   - plugin:cloudify-aws-plugin
+
+inputs:
+   aws_region_name:
+      default: 'us-east-2'
+
+dsl_definitions:
+   client_config: &client_config
+      aws_access_key_id: { get_secret: aws_access_key_id }
+      aws_secret_access_key: { get_secret: aws_secret_access_key }
+      region_name: { get_input: aws_region_name }
+
+node_templates: 
+   my_key:
+      type: cloudify.nodes.aws.ec2.Keypair
+      properties:
+         client_config: *client_config
+         resource_config:
+            KeyName: CloudifyTest
+         store_in_runtime_properties: true
+         create_secret: true
+         secret_name: aws_cloudify_private_key
+         update_existing_secret: true
